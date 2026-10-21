@@ -67,7 +67,27 @@ void dealloc(Node* head)
 //   function object struct declarations
 // -----------------------------------------------
 
-
+// Removes odd numbers
+struct IsOdd {
+    bool operator()(int v) { return v % 2 != 0; }
+};
+ 
+// Removes numbers greater than a limit chosen at construction
+struct GreaterThan {
+    int limit;
+    GreaterThan(int l) : limit(l) {}
+    bool operator()(int v) { return v > limit; }
+};
+ 
+// Removes everything
+struct RemoveAll {
+    bool operator()(int) { return true; }
+};
+ 
+// Removes nothing
+struct RemoveNone {
+    bool operator()(int) { return false; }
+};
 
 
 
@@ -86,7 +106,66 @@ int main(int argc, char* argv[])
     print(head);
 
     // Test out your linked list code
-
+    Node* smaller = NULL;
+    Node* larger = NULL;
+    llpivot(head, smaller, larger, 9);
+    cout << "Pivot 9 -> smaller: ";
+    print(smaller);
+    cout << "Pivot 9 -> larger:  ";
+    print(larger);
+    cout << "head after llpivot is " << (head == NULL ? "NULL" : "NOT NULL (bug!)") << endl;
+    dealloc(smaller);
+    dealloc(larger);
+ 
+    // llpivot with garbage in smaller/larger, and with pivot at the extremes
+    head = readList(argv[1]);
+    smaller = (Node*)0x1;       // garbage on purpose
+    larger = (Node*)0x2;
+    llpivot(head, smaller, larger, 1000);   // everything <= pivot
+    cout << "Pivot 1000 -> smaller: ";
+    print(smaller);
+    cout << "Pivot 1000 -> larger is " << (larger == NULL ? "empty" : "NOT empty (bug!)") << endl;
+    dealloc(smaller);
+ 
+    head = readList(argv[1]);
+    llpivot(head, smaller, larger, -1000);  // everything > pivot
+    cout << "Pivot -1000 -> smaller is " << (smaller == NULL ? "empty" : "NOT empty (bug!)") << endl;
+    cout << "Pivot -1000 -> larger: ";
+    print(larger);
+    dealloc(larger);
+ 
+    // empty list
+    head = NULL;
+    llpivot(head, smaller, larger, 9);
+    cout << "Empty list -> smaller/larger/head all NULL? "
+         << ((smaller == NULL && larger == NULL && head == NULL) ? "yes" : "NO (bug!)") << endl;
+ 
+    // ---- llfilter ----
+    head = readList(argv[1]);
+    head = llfilter(head, IsOdd());
+    cout << "Remove odds: ";
+    print(head);
+    dealloc(head);
+ 
+    head = readList(argv[1]);
+    head = llfilter(head, GreaterThan(9));
+    cout << "Remove values > 9: ";
+    print(head);
+    dealloc(head);
+ 
+    head = readList(argv[1]);
+    head = llfilter(head, RemoveAll());
+    cout << "Remove all -> list is " << (head == NULL ? "empty" : "NOT empty (bug!)") << endl;
+    dealloc(head);
+ 
+    head = readList(argv[1]);
+    head = llfilter(head, RemoveNone());
+    cout << "Remove none: ";
+    print(head);
+    dealloc(head);
+ 
+    head = llfilter((Node*)NULL, IsOdd());
+    cout << "Filter on empty list -> " << (head == NULL ? "NULL" : "NOT NULL (bug!)") << endl;
 
 
     

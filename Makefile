@@ -13,3 +13,5 @@ clean:
 	rm -f *.o rh llrec-test *~
 
 .PHONY: clean 
+llrec-test: llrec-test.cpp llrec.cpp llrec.h
+	$(CXX) $(CXXFLAGS) llrec-test.cpp llrec.cpp -o llrec-test
